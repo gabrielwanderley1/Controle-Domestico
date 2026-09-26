@@ -1,0 +1,131 @@
+/* ========================================
+   AddItemForm – Estilos (Dark Mode)
+   Usa design tokens de variables.css
+   ======================================== */
+
+.add-item-form {
+  width: 100%;
+  max-width: 460px;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.add-item-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 1.25rem;
+}
+
+/* ── Campos ─────────────────────────── */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.form-field label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-field input {
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  width: 100%;
+}
+
+.form-field input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.form-field input:focus {
+  border-color: var(--color-accent);
+}
+
+.form-field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estiliza o input date para manter consistência dark */
+.form-field input[type="date"] {
+  color-scheme: dark;
+}
+
+/* ── Linha dupla (quantidade + duração) ── */
+
+.form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.form-row .form-field {
+  flex: 1;
+}
+
+/* ── Preview de término ─────────────── */
+
+.preview-termino {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background-color: rgba(124, 138, 255, 0.08);
+  border: 1px solid rgba(124, 138, 255, 0.2);
+  margin-bottom: 1rem;
+  font-size: var(--font-size-sm);
+}
+
+.preview-label {
+  color: var(--color-text-secondary);
+}
+
+.preview-date {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* ── Botão submit ───────────────────── */
+
+.add-item-submit {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: var(--color-accent);
+  color: #fff;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), opacity var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+}
+
+.add-item-submit:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}
+
+.add-item-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Reutiliza o spinner-small do AuthPage.css (animação spin global) */

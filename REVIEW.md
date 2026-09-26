@@ -46,4 +46,23 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - Estilos migrados com sucesso para variáveis CSS globais (`variables.css`), garantindo padronização tipográfica, paleta Dark Mode e consistência em componentes (`FeedbackPopup`, `AuthPage`, `HomePage`).
   - Nenhuma inconsistência técnica ou quebra de build detectada.
 
+### [TASK-03] - Formulário de Cadastro de Itens (AddItemForm) e Integração com Dashboard
+- **Data da Revisão:** 2026-09-26
+- **Veredito:** APROVADO COM AJUSTES
+- **Arquivos Auditados:**
+  - `Aplicativo/src/components/AddItemForm.tsx`
+  - `Aplicativo/src/components/AddItemForm.css`
+  - `Aplicativo/src/pages/HomePage.tsx`
+  - `Aplicativo/src/pages/HomePage.css`
+  - `Aplicativo/src/index.css`
+  - `Aplicativo/src/pages/AuthPage.css`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Cálculo de término cruzando `data_compra`, `quantidade` e `duracao_dias_unidade`; mensagem exata *"Alterações salvas com sucesso!"*; sem `alert()` nativo; feedback via `FeedbackPopup`).
+  - [x] Inexistência de segredos no código (Persistência via `insertItem` com RLS do Supabase).
+  - [x] Verificação de integridade da tipagem e build (`npm run build` executado com 0 erros).
+  - [x] Não-regressão e reutilização de estilos (Globalização do `.spinner-small` em `index.css`).
+- **Observações / Correções Aplicadas:**
+  - **Ação Corretiva Direta (Timezone):** Ajustadas as funções `getTodayISO()` e `calcularDataTermino()` em `AddItemForm.tsx` para operar com base na data do fuso horário local em vez de `toISOString()`, prevenindo deslocamentos involuntários de data em fusos horários negativos (ex: UTC-3).
+  - Veredito final: APROVADO COM AJUSTES (correção de fuso horário realizada com sucesso durante a auditoria).
+
 ---
