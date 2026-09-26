@@ -10,4 +10,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,      // Persiste sessão no localStorage (padrão, explícito por clareza)
+    autoRefreshToken: true,     // Renova o JWT automaticamente antes de expirar
+    detectSessionInUrl: true,   // Necessário para fluxos de recuperação de senha via link/OTP
+  },
+});
