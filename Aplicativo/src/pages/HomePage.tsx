@@ -1,5 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import { signOutUser } from '../services/authService';
+import './HomePage.css';
 
 /**
  * Página placeholder para o Dashboard/Estoque.

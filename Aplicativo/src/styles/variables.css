@@ -1,0 +1,49 @@
+/* ========================================
+   Design Tokens – Variáveis Globais
+   Paleta escura, minimalista e coesa.
+   ======================================== */
+
+:root {
+  /* ── Cores de fundo ─────────────────── */
+  --color-bg-primary: #121220;
+  --color-bg-card: #1e1e2e;
+  --color-bg-input: #16162a;
+  --color-bg-hover: #2a2a3e;
+
+  /* ── Cores de texto ─────────────────── */
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #999;
+  --color-text-muted: #888;
+  --color-text-disabled: #555;
+
+  /* ── Cor de destaque / accent ────────── */
+  --color-accent: #7c8aff;
+  --color-accent-hover: #6b79ee;
+
+  /* ── Cores semânticas ───────────────── */
+  --color-success: #4caf80;
+  --color-error: #e05555;
+
+  /* ── Bordas ─────────────────────────── */
+  --color-border: #333;
+  --color-border-hover: #666;
+  --color-border-active: #444;
+
+  /* ── Tipografia ─────────────────────── */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8rem;
+  --font-size-base: 0.95rem;
+  --font-size-lg: 1rem;
+  --font-size-xl: 1.5rem;
+
+  /* ── Espaçamento ────────────────────── */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  /* ── Transições ─────────────────────── */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}

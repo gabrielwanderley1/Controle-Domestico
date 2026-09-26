@@ -1,3 +1,8 @@
+/* ========================================
+   FeedbackPopup – Toast (Dark Mode)
+   Usa design tokens de variables.css
+   ======================================== */
+
 .feedback-popup {
   position: fixed;
   top: 1.5rem;
@@ -7,17 +12,17 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.25rem;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font-size: 0.9rem;
-  color: #e0e0e0;
+  color: var(--color-text-primary);
   z-index: 9999;
-  animation: feedbackSlideIn 0.3s ease-out;
+  animation: feedbackSlideIn var(--transition-normal);
   max-width: 90vw;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .feedback-popup.feedback-exit {
-  animation: feedbackSlideOut 0.3s ease-in forwards;
+  animation: feedbackSlideOut var(--transition-normal) forwards;
 }
 
 .feedback-success {
@@ -48,12 +53,12 @@
 .feedback-close {
   background: none;
   border: none;
-  color: #888;
+  color: var(--color-text-muted);
   cursor: pointer;
   font-size: 0.85rem;
   padding: 0.25rem;
   flex-shrink: 0;
-  transition: color 0.2s;
+  transition: color var(--transition-fast);
 }
 
 .feedback-close:hover {

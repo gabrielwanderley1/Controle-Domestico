@@ -1,0 +1,31 @@
+/* ========================================
+   HomePage – Estilos
+   ======================================== */
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.logout-button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-active);
+  background: transparent;
+  color: #ccc;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.logout-button:hover {
+  background-color: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}

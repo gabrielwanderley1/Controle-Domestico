@@ -1,5 +1,6 @@
 /* ========================================
    AuthPage – Estilos (Dark Mode)
+   Usa design tokens de variables.css
    ======================================== */
 
 .auth-container {
@@ -13,8 +14,8 @@
 .auth-card {
   width: 100%;
   max-width: 400px;
-  background-color: #1e1e2e;
-  border-radius: 1rem;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-lg);
   padding: 2rem 1.75rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
@@ -26,22 +27,22 @@
 }
 
 .auth-title {
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 700;
-  color: #e0e0e0;
+  color: var(--color-text-primary);
   margin: 0 0 0.25rem;
 }
 
 .auth-subtitle {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
 /* Tabs */
 .auth-tabs {
   display: flex;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 1.5rem;
 }
 
@@ -54,7 +55,7 @@
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.2s, border-bottom 0.2s;
+  transition: color var(--transition-fast), border-bottom var(--transition-fast);
   border-bottom: 2px solid transparent;
 }
 
@@ -63,8 +64,8 @@
 }
 
 .auth-tab-active {
-  color: #7c8aff;
-  border-bottom-color: #7c8aff;
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
 }
 
 /* Form */
@@ -81,8 +82,8 @@
 }
 
 .form-group label {
-  font-size: 0.8rem;
-  color: #999;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -90,21 +91,21 @@
 
 .form-group input {
   padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #333;
-  background-color: #16162a;
-  color: #e0e0e0;
-  font-size: 0.95rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-fast);
 }
 
 .form-group input::placeholder {
-  color: #555;
+  color: var(--color-text-disabled);
 }
 
 .form-group input:focus {
-  border-color: #7c8aff;
+  border-color: var(--color-accent);
 }
 
 .form-group input:disabled {
@@ -115,14 +116,14 @@
 /* Submit button */
 .auth-submit {
   padding: 0.8rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-sm);
   border: none;
-  background-color: #7c8aff;
+  background-color: var(--color-accent);
   color: #fff;
-  font-size: 1rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s, opacity 0.2s;
+  transition: background-color var(--transition-fast), opacity var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +132,7 @@
 }
 
 .auth-submit:hover:not(:disabled) {
-  background-color: #6b79ee;
+  background-color: var(--color-accent-hover);
 }
 
 .auth-submit:disabled {
@@ -150,12 +151,12 @@
 }
 
 .password-checks li {
-  font-size: 0.75rem;
-  transition: color 0.2s;
+  font-size: var(--font-size-xs);
+  transition: color var(--transition-fast);
 }
 
 .check-ok {
-  color: #4caf80;
+  color: var(--color-success);
 }
 
 .check-fail {

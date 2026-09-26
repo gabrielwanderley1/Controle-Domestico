@@ -25,16 +25,25 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
 
 ## 2. Histórico de Auditorias
 
-### [ID da Tarefa] - [Nome da Tarefa]
-- **Data da Revisão:** YYYY-MM-DD
-- **Veredito:** [APROVADO | AJUSTES NECESSÁRIOS]
+### [TASK-02] - Centralização de Design Tokens, Estilização Dark Mode e Assets Base
+- **Data da Revisão:** 2026-09-26
+- **Veredito:** APROVADO
 - **Arquivos Auditados:**
-  - `caminho/do/arquivo.ext`
+  - `Aplicativo/src/styles/variables.css`
+  - `Aplicativo/src/index.css`
+  - `Aplicativo/src/components/FeedbackPopup.css`
+  - `Aplicativo/src/pages/AuthPage.css`
+  - `Aplicativo/src/pages/HomePage.css`
+  - `Aplicativo/src/pages/HomePage.tsx`
+  - `Aplicativo/public/favicon.svg`
+  - `Aplicativo/.gitignore`
 - **Validações Realizadas:**
-  - [x] Conformidade de escopo com CONTEXTO.md
-  - [x] Inexistência de segredos no código
-  - [x] Verificação de integridade da tipagem e build
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Design system Dark Mode, sem avanço prematuro para módulos futuros de estoque)
+  - [x] Inexistência de segredos no código (Variáveis e `.gitignore` validados)
+  - [x] Verificação de integridade da tipagem e build (`npm run build` executado com 0 erros)
+  - [x] Resolução de referências de assets (Favicon SVG alinhado ao `index.html`)
 - **Observações / Correções Aplicadas:**
-  - Descrição breve de eventuais ajustes finos executados pelo revisor.
+  - Estilos migrados com sucesso para variáveis CSS globais (`variables.css`), garantindo padronização tipográfica, paleta Dark Mode e consistência em componentes (`FeedbackPopup`, `AuthPage`, `HomePage`).
+  - Nenhuma inconsistência técnica ou quebra de build detectada.
 
 ---
