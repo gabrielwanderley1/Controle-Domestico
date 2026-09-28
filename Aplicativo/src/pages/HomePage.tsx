@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { signOutUser } from '../services/authService';
 import { AddItemForm } from '../components/AddItemForm';
+import { ItemList } from '../components/ItemList';
 import { FeedbackPopup, type FeedbackType } from '../components/FeedbackPopup';
 import './HomePage.css';
 
@@ -13,11 +14,12 @@ interface FeedbackState {
 
 /**
  * Página principal (Dashboard).
- * Integra o formulário de adição de itens com feedback visual.
- * A listagem de itens será implementada em tarefas futuras.
+ * Integra o formulário de adição e a listagem de itens do estoque.
+ * O `refreshKey` é incrementado após cada inserção para recarregar a lista.
  */
 export function HomePage() {
   const { user } = useAuth();
+  const [refreshKey, setRefreshKey] = useState(0);
   const [feedback, setFeedback] = useState<FeedbackState>({
     message: '',
     type: 'info',
@@ -33,7 +35,7 @@ export function HomePage() {
   }
 
   function handleItemAdded() {
-    // Futuramente: recarregar lista de itens aqui
+    setRefreshKey((k) => k + 1);
   }
 
   async function handleLogout() {
@@ -66,6 +68,8 @@ export function HomePage() {
           onItemAdded={handleItemAdded}
           onFeedback={showFeedback}
         />
+
+        <ItemList refreshKey={refreshKey} />
       </main>
     </div>
   );

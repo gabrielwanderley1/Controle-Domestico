@@ -65,4 +65,21 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - **Ação Corretiva Direta (Timezone):** Ajustadas as funções `getTodayISO()` e `calcularDataTermino()` em `AddItemForm.tsx` para operar com base na data do fuso horário local em vez de `toISOString()`, prevenindo deslocamentos involuntários de data em fusos horários negativos (ex: UTC-3).
   - Veredito final: APROVADO COM AJUSTES (correção de fuso horário realizada com sucesso durante a auditoria).
 
+### [TASK-04] - Listagem de Estoque (ItemList) e Indicadores Visuais de Validade
+- **Data da Revisão:** 2026-09-28
+- **Veredito:** APROVADO COM AJUSTES
+- **Arquivos Auditados:**
+  - `Aplicativo/src/components/ItemList.tsx`
+  - `Aplicativo/src/components/ItemList.css`
+  - `Aplicativo/src/pages/HomePage.tsx`
+  - `Aplicativo/src/styles/variables.css`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Dashboard do estoque atual implementado com listagem reativa e indicativos visuais sutis para itens próximos do término ou zerados).
+  - [x] Inexistência de segredos no código (Consulta via `fetchItens` com RLS `auth.uid() = user_id`).
+  - [x] Verificação de integridade da tipagem e build (`npm run build` executado com 0 erros).
+  - [x] Design System e Tokens (Inclusão de `--color-warning` em `variables.css` e estilização minimalista em Dark Mode).
+- **Observações / Correções Aplicadas:**
+  - **Ação Corretiva Direta (Cálculo de Dias Restantes):** Ajustada a fórmula em `ItemList.tsx` (`getDiasRestantes`) para utilizar `Math.round` em vez de `Math.ceil`, garantindo precisão em comparações de datas e neutralizando variações mínimas em transições de horário de verão.
+  - Veredito final: APROVADO COM AJUSTES (ajuste fino preventivo de arredondamento temporal aplicado com sucesso).
+
 ---

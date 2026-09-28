@@ -1,0 +1,205 @@
+/* ========================================
+   ItemList – Listagem de Estoque (Dark Mode)
+   Usa design tokens de variables.css
+
+   Status visuais:
+   - .item-normal   → sem destaque (padrão)
+   - .item-atencao  → borda/badge amarelo (1–5 dias)
+   - .item-critico  → borda/badge vermelho (vencido/hoje)
+   ======================================== */
+
+.item-list {
+  width: 100%;
+  max-width: 460px;
+}
+
+.item-list-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.item-list-count {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg-hover);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+}
+
+/* ── Lista ─────────────────────────── */
+
+.item-list-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* ── Card de item ──────────────────── */
+
+.item-card {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  border-left: 3px solid transparent;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.item-card:hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* Status: Normal — sem borda especial */
+.item-normal {
+  border-left-color: var(--color-border);
+}
+
+/* Status: Atenção — borda amarela sutil */
+.item-atencao {
+  border-left-color: var(--color-warning);
+}
+
+/* Status: Crítico — borda vermelha */
+.item-critico {
+  border-left-color: var(--color-error);
+}
+
+/* ── Topo do card (nome + badge) ──── */
+
+.item-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.item-nome {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+/* ── Badges de status ────────────── */
+
+.item-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.item-badge-atencao {
+  background-color: rgba(224, 168, 48, 0.15);
+  color: var(--color-warning);
+}
+
+.item-badge-critico {
+  background-color: rgba(224, 85, 85, 0.15);
+  color: var(--color-error);
+}
+
+/* ── Detalhes do item ────────────── */
+
+.item-card-details {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem 0.75rem;
+}
+
+@media (max-width: 420px) {
+  .item-card-details {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.item-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.item-detail-label {
+  font-size: 0.65rem;
+  color: var(--color-text-disabled);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.item-detail-value {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.item-detail-highlight {
+  font-weight: 600;
+}
+
+.item-atencao .item-detail-highlight {
+  color: var(--color-warning);
+}
+
+.item-critico .item-detail-highlight {
+  color: var(--color-error);
+}
+
+/* ── Estados: loading, erro, vazio ── */
+
+.item-list-status {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  gap: 0.4rem;
+}
+
+.item-list-error {
+  color: var(--color-error);
+  font-weight: 500;
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+.item-list-error-detail {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.item-list-empty-icon {
+  font-size: 2rem;
+  margin: 0 0 0.25rem;
+}
+
+.item-list-empty {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  margin: 0;
+}
+
+.item-list-empty-hint {
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
