@@ -82,4 +82,26 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - **Ação Corretiva Direta (Cálculo de Dias Restantes):** Ajustada a fórmula em `ItemList.tsx` (`getDiasRestantes`) para utilizar `Math.round` em vez de `Math.ceil`, garantindo precisão em comparações de datas e neutralizando variações mínimas em transições de horário de verão.
   - Veredito final: APROVADO COM AJUSTES (ajuste fino preventivo de arredondamento temporal aplicado com sucesso).
 
+### [TASK-05] - Worker de Notificações em Background (Node.js, Cron e SMTP)
+- **Data da Revisão:** 2026-09-29
+- **Veredito:** APROVADO COM AJUSTES
+- **Arquivos Auditados:**
+  - `Worker/src/config.ts`
+  - `Worker/src/supabaseClient.ts`
+  - `Worker/src/mailer.ts`
+  - `Worker/src/worker.ts`
+  - `Worker/package.json`
+  - `Worker/tsconfig.json`
+  - `Worker/.env.example`
+  - `Worker/.gitignore`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Separação estrita de ambientes: back-end Node.js isolado na pasta `Worker/`; rotina periódica via `node-cron` para monitoramento de vencimento; consulta administrativa com `service_role_key` isolada no back-end; despacho de alertas via SMTP/e-mail agrupado por usuário).
+  - [x] Inexistência de segredos no código (Arquivo `.env` contendo credenciais críticas mantido devidamente ignorado via `.gitignore`; variáveis carregadas estritamente por `process.env`).
+  - [x] Verificação de integridade da tipagem e build (`npm run build` do Worker e do Aplicativo executados com 0 erros).
+  - [x] Não-exposição de chaves sensíveis (A `SUPABASE_SERVICE_ROLE_KEY` permanece estritamente restrita ao ambiente do Worker).
+- **Observações / Correções Aplicadas:**
+  - **Ação Corretiva Direta (Restauração e Segurança de Arquivos):** Os arquivos fonte TypeScript em `Worker/src` e as configurações principais (`package.json`, `tsconfig.json`, `.gitignore`) encontravam-se vazios (0 bytes) e sem `.env.example`. Foi criado o `Worker/.gitignore` bloqueando dependências, builds e `.env`, e os arquivos `.ts` e configurações foram integralmente reconstituídos e tipados.
+  - **Ação Corretiva Direta (Timezone no Limiar):** Implementada a função `formatToISO()` em `Worker/src/worker.ts` para utilizar extração local de data em vez de conversão direta via `toISOString()`, evitando discrepâncias de fuso horário.
+  - Veredito final: APROVADO COM AJUSTES (correção crítica de fontes vazios, segurança de `.gitignore` e blindagem de timezone aplicadas com sucesso durante a auditoria).
+
 ---
