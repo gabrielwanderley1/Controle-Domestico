@@ -1,23 +1,21 @@
 import cron from 'node-cron';
 import { config } from './config.js';
-import { supabase } from './supabaseClient.js';
+import { supabaseAdmin } from './supabaseClient.js';
 import { sendEmail, verifySmtpConnection } from './mailer.js';
+import { varrerItensVencendo, type ItemAlerta } from './varredura.js';
 
-interface ExpiringItem {
-  id: string;
-  nome: string;
-  quantidade: number;
-  data_estimada_termino: string | null;
-  user_id: string;
-}
+type ExpiringItem = ItemAlerta;
 
 /**
  * Worker de Notificações — Controle Doméstico
  *
- * Serviço autônomo de background que roda uma rotina periódica (cron job)
- * para verificar itens próximos do vencimento e enviar alertas por e-mail.
+ * Serviço autônomo de background que roda uma rotina diária (cron job)
+ * para verificar itens próximos do vencimento, mapear os tokens FCM
+ * dos usuários afetados e disparar alertas.
  *
  * NÃO expõe rotas HTTP — o front-end consome o Supabase diretamente via RLS.
+ *
+ * Uso: `npm start` (agendado) ou `npm run scan` (executa uma vez e sai).
  */
 console.log('══════════════════════════════════════════');
 console.log('  🏠 Controle Doméstico — Worker');
@@ -27,91 +25,76 @@ console.log(`  ⏰ Alerta: itens vencendo em ≤ ${config.alertDaysThreshold} di
 console.log(`  🔗 Supabase: ${config.supabase.url}`);
 console.log('──────────────────────────────────────────');
 
-// ── Verificação SMTP na inicialização ──────────────────────
-await verifySmtpConnection();
+const runOnce = process.argv.includes('--once');
 
-// ── Validação do cron schedule ─────────────────────────────
-if (!cron.validate(config.cronSchedule)) {
-  console.error(`❌ Expressão cron inválida: "${config.cronSchedule}"`);
-  process.exit(1);
+if (runOnce) {
+  // Execução única: o processo encerra sozinho ao fim (sem process.exit,
+  // que dispara uma assertion do libuv no Windows).
+  await executarRotinaDiaria();
+} else {
+  await iniciarAgendador();
 }
 
-// ── Agendamento do job ─────────────────────────────────────
-cron.schedule(config.cronSchedule, async () => {
+async function iniciarAgendador(): Promise<void> {
+  // ── Verificação SMTP na inicialização ────────────────────
+  await verifySmtpConnection();
+
+  // ── Validação do cron schedule ───────────────────────────
+  if (!cron.validate(config.cronSchedule)) {
+    console.error(`❌ Expressão cron inválida: "${config.cronSchedule}"`);
+    process.exit(1);
+  }
+
+  // ── Agendamento do job (diário, horário de Brasília) ─────
+  cron.schedule(config.cronSchedule, executarRotinaDiaria, {
+    timezone: 'America/Sao_Paulo',
+  });
+
+  console.log('\n✅ Worker iniciado. Aguardando próxima execução do cron...\n');
+}
+
+// ── Rotina diária ──────────────────────────────────────────
+
+async function executarRotinaDiaria(): Promise<void> {
   const timestamp = new Date().toISOString();
-  console.log(`\n🔔 [${timestamp}] Executando verificação de estoque...`);
+  console.log(`\n🔔 [${timestamp}] Executando verificação diária de validade...`);
 
   try {
-    await checkExpiringItems();
+    const alertas = await varrerItensVencendo();
+
+    if (alertas.length === 0) {
+      console.log('  ℹ️  Nenhum item próximo do vencimento encontrado.');
+    } else {
+      const totalTokens = alertas.reduce((n, a) => n + a.tokens.length, 0);
+      console.log(`  📋 Resumo: ${alertas.length} usuário(s), ${totalTokens} token(s) FCM prontos para envio.`);
+      // O disparo push via FCM será implementado na próxima tarefa.
+
+      // Canal de fallback já existente: e-mail
+      for (const alerta of alertas) {
+        await notificarPorEmail(alerta.userId, alerta.itens);
+      }
+    }
+
     console.log(`✅ [${timestamp}] Verificação concluída.`);
   } catch (error) {
     console.error(`❌ [${timestamp}] Erro na verificação:`, error);
   }
-});
+}
 
-console.log('\n✅ Worker iniciado. Aguardando próxima execução do cron...\n');
+/** Busca o e-mail do usuário (Auth Admin) e envia o alerta. */
+async function notificarPorEmail(userId: string, userItens: ExpiringItem[]): Promise<void> {
+  const { data: userData, error: userError } = await supabaseAdmin
+    .auth.admin.getUserById(userId);
 
-// ── Lógica de verificação ──────────────────────────────────
-
-/**
- * Busca itens de todos os usuários cuja `data_estimada_termino`
- * está dentro do limiar de alerta e envia e-mails de notificação.
- *
- * Usa a service_role key, que bypassa o RLS, permitindo leitura
- * global da tabela `itens` para verificar vencimentos.
- */
-async function checkExpiringItems(): Promise<void> {
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
-  const limiar = new Date(hoje);
-  limiar.setDate(limiar.getDate() + config.alertDaysThreshold);
-  const limiarISO = formatToISO(limiar);
-
-  // Busca itens com término ≤ limiar e quantidade > 0 (ainda em estoque)
-  const { data: itens, error } = await supabase
-    .from('itens')
-    .select('id, nome, quantidade, data_estimada_termino, user_id')
-    .lte('data_estimada_termino', limiarISO)
-    .gt('quantidade', 0);
-
-  if (error) {
-    throw new Error(`Erro ao consultar itens: ${error.message}`);
-  }
-
-  if (!itens || itens.length === 0) {
-    console.log('  ℹ️  Nenhum item próximo do vencimento encontrado.');
+  if (userError || !userData?.user?.email) {
+    console.warn(`  ⚠️  Não foi possível obter e-mail do usuário ${userId}`);
     return;
   }
 
-  console.log(`  📦 ${itens.length} item(ns) próximo(s) do vencimento encontrado(s).`);
-
-  // Agrupa itens por user_id para enviar um único e-mail por usuário
-  const itensPorUsuario = new Map<string, ExpiringItem[]>();
-
-  for (const item of (itens as ExpiringItem[])) {
-    const lista = itensPorUsuario.get(item.user_id) ?? [];
-    lista.push(item);
-    itensPorUsuario.set(item.user_id, lista);
-  }
-
-  // Para cada usuário, busca o e-mail e envia a notificação
-  for (const [userId, userItens] of itensPorUsuario) {
-    const { data: userData, error: userError } = await supabase
-      .auth.admin.getUserById(userId);
-
-    if (userError || !userData?.user?.email) {
-      console.warn(`  ⚠️  Não foi possível obter e-mail do usuário ${userId}`);
-      continue;
-    }
-
-    const email = userData.user.email;
-    const subject = `⚠️ ${userItens.length} item(ns) do estoque prestes a acabar`;
-    const html = buildAlertEmailHtml(userItens);
-
-    await sendEmail(email, subject, html);
-  }
+  const subject = `⚠️ ${userItens.length} item(ns) do estoque prestes a acabar`;
+  await sendEmail(userData.user.email, subject, buildAlertEmailHtml(userItens));
 }
+
 
 /**
  * Monta o corpo HTML do e-mail de alerta com a lista de itens.
@@ -154,16 +137,6 @@ function buildAlertEmailHtml(itens: ExpiringItem[]): string {
       </p>
     </div>
   `;
-}
-
-/**
- * Formata data local para YYYY-MM-DD.
- */
-function formatToISO(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
 }
 
 /**

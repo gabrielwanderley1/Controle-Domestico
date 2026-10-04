@@ -9,7 +9,7 @@ import { config } from './config.js';
  *
  * ⚠️ Esta chave NUNCA deve ser exposta no front-end.
  */
-export const supabase = createClient(
+export const supabaseAdmin = createClient(
   config.supabase.url,
   config.supabase.serviceRoleKey,
   {
@@ -19,4 +19,7 @@ export const supabase = createClient(
     },
   },
 );
+
+/** Alias mantido para compatibilidade com imports existentes. */
+export const supabase = supabaseAdmin;
 

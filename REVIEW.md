@@ -104,4 +104,22 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - **Ação Corretiva Direta (Timezone no Limiar):** Implementada a função `formatToISO()` em `Worker/src/worker.ts` para utilizar extração local de data em vez de conversão direta via `toISOString()`, evitando discrepâncias de fuso horário.
   - Veredito final: APROVADO COM AJUSTES (correção crítica de fontes vazios, segurança de `.gitignore` e blindagem de timezone aplicadas com sucesso durante a auditoria).
 
+### [TASK-06] - Módulo de Varredura de Estoque, Mapeamento FCM e Modo de Execução Única
+- **Data da Revisão:** 2026-10-04
+- **Veredito:** APROVADO COM AJUSTES
+- **Arquivos Auditados:**
+  - `Worker/src/varredura.ts`
+  - `Worker/src/worker.ts`
+  - `Worker/src/supabaseClient.ts`
+  - `Worker/package.json`
+  - `Worker/supabase/fcm_tokens.sql`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Separação modular da varredura diária de itens próximos da validade/vencidos, preparação para envio de push notification mapeando tokens FCM dos usuários afetados, preservação do canal de fallback de e-mail).
+  - [x] Inexistência de segredos no código (Uso estrito de `supabaseAdmin` em ambiente back-end via `service_role_key`; credenciais mantidas em variáveis de ambiente).
+  - [x] Verificação de integridade da tipagem e build (`npm run build` do Worker e do Aplicativo compilados com 0 erros).
+  - [x] Segurança de Banco / RLS (Criação de DDL idempotente para `fcm_tokens` com RLS habilitado e policies restritas a `auth.uid() = user_id`).
+- **Observações / Correções Aplicadas:**
+  - **Ação Corretiva Direta (Restauração de Arquivos):** Os arquivos `Worker/src/varredura.ts` e `Worker/supabase/fcm_tokens.sql` foram criados inicialmente com 0 bytes no ambiente, provocando quebra de imports em `Worker/src/worker.ts`. O código TypeScript de varredura foi integralmente reconstituído e o script SQL estruturado com tabelas, índices e políticas de Row Level Security.
+  - Veredito final: APROVADO COM AJUSTES (correção de arquivos vazios e implementação do schema SQL de tokens FCM concluídas com sucesso).
+
 ---
