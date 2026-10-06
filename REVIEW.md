@@ -122,4 +122,22 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - **Ação Corretiva Direta (Restauração de Arquivos):** Os arquivos `Worker/src/varredura.ts` e `Worker/supabase/fcm_tokens.sql` foram criados inicialmente com 0 bytes no ambiente, provocando quebra de imports em `Worker/src/worker.ts`. O código TypeScript de varredura foi integralmente reconstituído e o script SQL estruturado com tabelas, índices e políticas de Row Level Security.
   - Veredito final: APROVADO COM AJUSTES (correção de arquivos vazios e implementação do schema SQL de tokens FCM concluídas com sucesso).
 
+### [TASK-07] - Configuração e Inicialização do Capacitor Android (Mobile)
+- **Data da Revisão:** 2026-10-06
+- **Veredito:** APROVADO
+- **Arquivos Auditados:**
+  - `Aplicativo/capacitor.config.ts`
+  - `Aplicativo/package.json`
+  - `Aplicativo/package-lock.json`
+  - `Aplicativo/tsconfig.node.json`
+  - `Aplicativo/android/`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Implementação da infraestrutura mobile via Capacitor para empacotamento do React em APK Android; `appId` configurado como `com.controledomestico.app`, `webDir` apontando para o bundle de produção `dist/`, e `backgroundColor` `#121220` Dark Mode prevenindo flash branco na WebView).
+  - [x] Inexistência de segredos no código (Nenhuma chave privada, credencial ou keystore exposta; template `.gitignore` do Android cobre `local.properties`, `*.jks`, `*.keystore` e diretórios de build).
+  - [x] Verificação de integridade da tipagem e build (`npm run build` do Aplicativo e do Worker executados com 0 erros; inclusão de `capacitor.config.ts` no `tsconfig.node.json` validada).
+  - [x] Ausência de regressão (Configurações de compilação web e scripts Vite preservados integralmente).
+- **Observações / Correções Aplicadas:**
+  - Todos os arquivos e dependências encontram-se íntegros, sem necessidade de intervenções corretivas imediatas.
+  - Veredito final: APROVADO.
+
 ---

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Controle Doméstico</string>
+    <string name="title_activity_main">Controle Doméstico</string>
+    <string name="package_name">com.controledomestico.app</string>
+    <string name="custom_url_scheme">com.controledomestico.app</string>
+</resources>
