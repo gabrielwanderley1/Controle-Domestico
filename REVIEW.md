@@ -140,4 +140,29 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - Todos os arquivos e dependências encontram-se íntegros, sem necessidade de intervenções corretivas imediatas.
   - Veredito final: APROVADO.
 
+### [TASK-08] - Integração Completa de Notificações Push Mobile (Firebase Admin FCM & Capacitor)
+- **Data da Revisão:** 2026-10-06
+- **Veredito:** APROVADO COM AJUSTES
+- **Arquivos Auditados:**
+  - `Worker/src/push.ts`
+  - `Worker/src/worker.ts`
+  - `Worker/package.json`
+  - `Worker/package-lock.json`
+  - `Worker/.gitignore`
+  - `Worker/supabase/fcm_tokens.sql`
+  - `Aplicativo/src/services/pushNotificationService.ts`
+  - `Aplicativo/src/contexts/AuthContext.tsx`
+  - `Aplicativo/package.json`
+  - `Aplicativo/package-lock.json`
+  - `Aplicativo/.gitignore`
+  - `.gitignore`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Rotina diária em background dispara notificações push multicast via FCM para aparelhos móveis dos usuários com itens a vencer ou zerados; fallback por e-mail preservado; registro de tokens no front-end restrito à plataforma nativa Capacitor sem quebrar o ambiente web).
+  - [x] Inexistência de segredos no código (Arquivo confidencial `firebase-service-account.json` estritamente contido no back-end e bloqueado no `.gitignore` da raiz, do Aplicativo e do Worker; nenhuma credencial hardcoded).
+  - [x] Verificação de integridade da tipagem e build (`npm run build` do Worker e do Aplicativo compilados com 0 erros).
+  - [x] Limpeza e resiliência de tokens (O serviço de push remove automaticamente da tabela `fcm_tokens` os tokens descartados ou desregistrados pelo FCM).
+- **Observações / Correções Aplicadas:**
+  - **Ação Corretiva Direta (Alinhamento de Schema e Upsert):** Ajustada a DDL em `Worker/supabase/fcm_tokens.sql` para definir a coluna `token` como `UNIQUE`, compatibilizando o contrato com a cláusula de upsert (`onConflict: 'token'`) executada em `Aplicativo/src/services/pushNotificationService.ts`.
+  - Veredito final: APROVADO COM AJUSTES (ajuste de constraint única em banco concluído com sucesso).
+
 ---

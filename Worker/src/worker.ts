@@ -3,6 +3,7 @@ import { config } from './config.js';
 import { supabaseAdmin } from './supabaseClient.js';
 import { sendEmail, verifySmtpConnection } from './mailer.js';
 import { varrerItensVencendo, type ItemAlerta } from './varredura.js';
+import { enviarPush } from './push.js';
 
 type ExpiringItem = ItemAlerta;
 
@@ -67,10 +68,13 @@ async function executarRotinaDiaria(): Promise<void> {
     } else {
       const totalTokens = alertas.reduce((n, a) => n + a.tokens.length, 0);
       console.log(`  📋 Resumo: ${alertas.length} usuário(s), ${totalTokens} token(s) FCM prontos para envio.`);
-      // O disparo push via FCM será implementado na próxima tarefa.
-
-      // Canal de fallback já existente: e-mail
+      // Push FCM (Firebase Admin) + e-mail como canal de fallback
       for (const alerta of alertas) {
+        try {
+          await enviarPush(alerta);
+        } catch (err) {
+          console.error(`  ❌ Erro no push para ${alerta.userId}:`, err);
+        }
         await notificarPorEmail(alerta.userId, alerta.itens);
       }
     }

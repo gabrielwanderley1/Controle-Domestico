@@ -4,3 +4,5 @@ dist
 .agents
 scripts
 configure_smtp.js
+firebase-service-account.json
+google-services.json

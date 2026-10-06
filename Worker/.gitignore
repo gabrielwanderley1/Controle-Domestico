@@ -3,3 +3,5 @@ dist/
 .env
 .env.local
 *.tsbuildinfo
+# Credenciais Firebase
+firebase-service-account.json

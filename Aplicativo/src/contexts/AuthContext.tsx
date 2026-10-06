@@ -7,6 +7,10 @@ import {
 } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
+import {
+  initPushNotifications,
+  teardownPushNotifications,
+} from '../services/pushNotificationService';
 
 interface AuthContextType {
   session: Session | null;
@@ -59,6 +63,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Registra o aparelho para push quando há usuário logado (apenas no Android)
+  const userId = session?.user?.id;
+  useEffect(() => {
+    if (userId) {
+      void initPushNotifications(userId);
+    } else {
+      void teardownPushNotifications();
+    }
+  }, [userId]);
 
   const value: AuthContextType = {
     session,

@@ -25,3 +25,5 @@ mcp_config.json
 
 # Cache TS
 *.tsbuildinfo
+
+firebase-service-account.json

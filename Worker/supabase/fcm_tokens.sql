@@ -7,10 +7,9 @@
 CREATE TABLE IF NOT EXISTS public.fcm_tokens (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE CASCADE,
-    token text NOT NULL,
+    token text NOT NULL UNIQUE,
     created_at timestamptz NOT NULL DEFAULT now(),
-    updated_at timestamptz NOT NULL DEFAULT now(),
-    CONSTRAINT fcm_tokens_user_token_key UNIQUE (user_id, token)
+    updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 -- Índice para consultas rápidas por user_id
