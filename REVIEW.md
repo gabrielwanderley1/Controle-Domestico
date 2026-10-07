@@ -165,4 +165,24 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - **Ação Corretiva Direta (Alinhamento de Schema e Upsert):** Ajustada a DDL em `Worker/supabase/fcm_tokens.sql` para definir a coluna `token` como `UNIQUE`, compatibilizando o contrato com a cláusula de upsert (`onConflict: 'token'`) executada em `Aplicativo/src/services/pushNotificationService.ts`.
   - Veredito final: APROVADO COM AJUSTES (ajuste de constraint única em banco concluído com sucesso).
 
+### [TASK-09] - Diagnóstico e Resolução de Crash em Cold Start e Push Notifications
+- **Data da Revisão:** 2026-10-06
+- **Veredito:** APROVADO COM AJUSTES
+- **Arquivos Auditados:**
+  - `Aplicativo/android/app/build.gradle`
+  - `Aplicativo/android/app/google-services.json`
+  - `Aplicativo/android/app/google-services.json.example`
+  - `Aplicativo/src/services/pushNotificationService.ts`
+  - `Aplicativo/src/contexts/AuthContext.tsx`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Foco estrito na resolução da falha crítica nativa e na blindagem de push notifications sem alterar telas ou regras de negócio).
+  - [x] Diagnóstico da quebra nativa (Identificada a ausência do plugin Google Services ativo por falta de `google-services.json`, o que impedia a injeção do `FirebaseInitProvider` e causava `IllegalStateException: Default FirebaseApp is not initialized` no `FirebaseMessaging.getInstance()`).
+  - [x] Configuração Nativa Gradle (Aplicação explícita de `apply plugin: 'com.google.gms.google-services'` em `Aplicativo/android/app/build.gradle` e inclusão do `google-services.json`).
+  - [x] Blindagem de runtime no front-end (Tratamento de todas as chamadas do Capacitor em blocos `try/catch`, validação da sessão autenticada do Supabase antes de disparar upsert em `fcm_tokens`, listener `registrationError` resiliente).
+  - [x] Prevenção de loop de crash no cold start (Desacoplamento assíncrono não-bloqueante no `AuthContext` com captura global de rejeições).
+  - [x] Verificação de build (`npm run build` do front-end, `npx cap sync android` e `gradlew assembleDebug` compilados com sucesso).
+- **Observações / Correções Aplicadas:**
+  - Foram blindados todos os fluxos de listener e persistência de token contra exceções de rede/sessão.
+  - Veredito final: APROVADO COM AJUSTES (blindagem defensiva e correção na configuração nativa implementadas e validadas).
+
 ---

@@ -67,10 +67,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Registra o aparelho para push quando há usuário logado (apenas no Android)
   const userId = session?.user?.id;
   useEffect(() => {
+    let isMounted = true;
+
     if (userId) {
-      void initPushNotifications(userId);
+      // Disparo assíncrono e não-bloqueante para garantir renderização fluida no cold start
+      const timer = setTimeout(() => {
+        if (isMounted) {
+          initPushNotifications(userId).catch((err) => {
+            console.error('[push] Falha ao inicializar push no login:', err);
+          });
+        }
+      }, 100);
+
+      return () => {
+        isMounted = false;
+        clearTimeout(timer);
+      };
     } else {
-      void teardownPushNotifications();
+      void teardownPushNotifications().catch((err) => {
+        console.error('[push] Falha ao encerrar push no logout:', err);
+      });
     }
   }, [userId]);
 
