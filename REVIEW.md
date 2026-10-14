@@ -184,5 +184,28 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
 - **Observações / Correções Aplicadas:**
   - Foram blindados todos os fluxos de listener e persistência de token contra exceções de rede/sessão.
   - Veredito final: APROVADO COM AJUSTES (blindagem defensiva e correção na configuração nativa implementadas e validadas).
+  - **⚠️ ERRATA (2026-10-14, ver TASK-10):** O `google-services.json` incluído nesta tarefa era **fictício** (`mobilesdk_app_id` e `api_key` inventados pelo agente). Ele eliminou o crash, mas impediu o FCM de gerar tokens. O arquivo foi removido na TASK-10.
+
+### [TASK-10] - Auditoria do Pipeline de Push (Ausência de Notificações no Android)
+- **Data da Revisão:** 2026-10-14
+- **Veredito:** APROVADO COM PENDÊNCIA (requer `google-services.json` real)
+- **Arquivos Auditados:**
+  - `Aplicativo/android/app/build.gradle`
+  - `Aplicativo/src/services/pushNotificationService.ts`
+  - `Worker/src/push.ts`
+  - `Worker/src/worker.ts`
+  - `Worker/src/testPush.ts` (novo)
+  - `Worker/package.json`
+- **Validações Realizadas:**
+  - [x] Tabela `fcm_tokens` consultada via service_role: **0 registros** (5 itens em estoque).
+  - [x] Credencial Firebase Admin do Worker validada via `dryRun` (autenticação OK).
+  - [x] `POST_NOTIFICATIONS` presente no manifesto mesclado.
+  - [x] `npm run build` do Worker e do Aplicativo com 0 erros.
+- **Observações / Correções Aplicadas:**
+  - **Causa raiz:** `google-services.json` fictício → FCM não emite token → nada é gravado em `fcm_tokens` → Worker pulava o push em silêncio e enviava sempre e-mail.
+  - Removido o arquivo fictício; o Gradle agora falha com mensagem explícita se o arquivo real estiver ausente.
+  - Worker: push é o canal principal; e-mail só como fallback quando nenhum aparelho recebe. Log explícito quando o usuário não tem token.
+  - Front-end: falha de inicialização do push libera nova tentativa (antes travava até o logout).
+  - Novo script `npm run test-push` (somente push, sem e-mail).
 
 ---

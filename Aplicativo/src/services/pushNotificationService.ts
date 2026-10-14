@@ -127,6 +127,13 @@ export async function initPushNotifications(userId: string): Promise<void> {
   } catch (err) {
     // Blindagem completa contra crash nativo ou unhandled rejection no runtime
     console.error('[push] Erro durante inicialização de notificações push:', err);
+    // Permite nova tentativa no próximo login/abertura em vez de travar o registro
+    initialized = false;
+    try {
+      await PushNotifications.removeAllListeners();
+    } catch {
+      /* ignora: listeners podem nem ter sido registrados */
+    }
   }
 }
 

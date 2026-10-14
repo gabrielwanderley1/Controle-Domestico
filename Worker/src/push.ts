@@ -35,9 +35,14 @@ function montarCorpo(alerta: AlertaUsuario): string {
 /**
  * Envia a notificação para todos os tokens do usuário e remove
  * da tabela `fcm_tokens` os tokens que o Firebase rejeitar como inválidos.
+ *
+ * @returns quantidade de aparelhos que aceitaram a notificação (0 = nenhum).
  */
-export async function enviarPush(alerta: AlertaUsuario): Promise<void> {
-  if (alerta.tokens.length === 0) return;
+export async function enviarPush(alerta: AlertaUsuario): Promise<number> {
+  if (alerta.tokens.length === 0) {
+    console.warn(`  ⚠️  Push ${alerta.userId}: nenhum token FCM registrado (app nunca registrou o aparelho).`);
+    return 0;
+  }
 
   const response = await getMessaging().sendEachForMulticast({
     tokens: alerta.tokens,
@@ -68,4 +73,6 @@ export async function enviarPush(alerta: AlertaUsuario): Promise<void> {
       console.log(`  🧹 ${invalidos.length} token(s) inválido(s) removido(s).`);
     }
   }
+
+  return response.successCount;
 }

@@ -68,14 +68,19 @@ async function executarRotinaDiaria(): Promise<void> {
     } else {
       const totalTokens = alertas.reduce((n, a) => n + a.tokens.length, 0);
       console.log(`  📋 Resumo: ${alertas.length} usuário(s), ${totalTokens} token(s) FCM prontos para envio.`);
-      // Push FCM (Firebase Admin) + e-mail como canal de fallback
+      // Push FCM (canal principal). E-mail apenas como fallback quando
+      // nenhum aparelho do usuário recebeu o push.
       for (const alerta of alertas) {
+        let entregues = 0;
         try {
-          await enviarPush(alerta);
+          entregues = await enviarPush(alerta);
         } catch (err) {
           console.error(`  ❌ Erro no push para ${alerta.userId}:`, err);
         }
-        await notificarPorEmail(alerta.userId, alerta.itens);
+        if (entregues === 0) {
+          console.log(`  📧 Fallback por e-mail para ${alerta.userId} (push não entregue).`);
+          await notificarPorEmail(alerta.userId, alerta.itens);
+        }
       }
     }
 

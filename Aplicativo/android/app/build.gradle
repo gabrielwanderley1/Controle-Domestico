@@ -44,5 +44,13 @@ dependencies {
 
 apply from: 'capacitor.build.gradle'
 
+// Obrigatório: sem o google-services.json REAL (baixado do Firebase Console),
+// o FirebaseApp não inicializa e o FCM não gera token. O build falha de
+// propósito para evitar um APK que nunca recebe push.
+if (!file('google-services.json').exists()) {
+    throw new GradleException(
+        "android/app/google-services.json ausente. Baixe-o no Firebase Console " +
+        "(projeto controle-domestico-36007 > App Android com.controledomestico.app).")
+}
 apply plugin: 'com.google.gms.google-services'
 
