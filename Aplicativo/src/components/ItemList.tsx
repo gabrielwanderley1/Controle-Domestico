@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { fetchItens } from '../services/itensService';
+import { deleteItem, fetchItens } from '../services/itensService';
 import type { Item } from '../types/database';
+import type { FeedbackType } from './FeedbackPopup';
 import './ItemList.css';
 
 /** Status de proximidade do término de um item. */
@@ -9,6 +10,8 @@ export type ItemStatus = 'normal' | 'atencao' | 'critico';
 interface ItemListProps {
   /** Incrementa quando a lista precisa ser recarregada (ex.: após adicionar item). */
   refreshKey?: number;
+  /** Callback para exibir feedback visual (sucesso/erro) no pop-up global. */
+  onFeedback?: (message: string, type: FeedbackType) => void;
 }
 
 /**
@@ -20,10 +23,12 @@ interface ItemListProps {
  * - **Atenção**: término em 1–5 dias
  * - **Crítico**: término hoje ou já ultrapassado
  */
-export function ItemList({ refreshKey = 0 }: ItemListProps) {
+export function ItemList({ refreshKey = 0, onFeedback }: ItemListProps) {
   const [itens, setItens] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [itemParaExcluir, setItemParaExcluir] = useState<Item | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,6 +51,23 @@ export function ItemList({ refreshKey = 0 }: ItemListProps) {
     load();
     return () => { cancelled = true; };
   }, [refreshKey]);
+
+  async function handleConfirmDelete(itemId: string) {
+    setDeletingId(itemId);
+    try {
+      await deleteItem(itemId);
+      setItens((prev) => prev.filter((item) => item.id !== itemId));
+      setItemParaExcluir(null);
+      onFeedback?.('Alterações salvas com sucesso!', 'success');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Não foi possível excluir o item.';
+      setItemParaExcluir(null);
+      onFeedback?.(message, 'error');
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   // ── Loading ──────────────────────────────────────────────
   if (loading) {
@@ -94,7 +116,35 @@ export function ItemList({ refreshKey = 0 }: ItemListProps) {
             <li key={item.id} className={`item-card item-${status}`}>
               <div className="item-card-top">
                 <span className="item-nome">{item.nome}</span>
-                <StatusBadge status={status} diasRestantes={diasRestantes} />
+                <div className="item-card-actions">
+                  <StatusBadge status={status} diasRestantes={diasRestantes} />
+                  <button
+                    type="button"
+                    className="item-delete-btn"
+                    onClick={() => setItemParaExcluir(item)}
+                    disabled={deletingId === item.id}
+                    title="Excluir item"
+                    aria-label={`Excluir ${item.nome}`}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                      <path d="M10 11v6" />
+                      <path d="M14 11v6" />
+                      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
               <div className="item-card-details">
@@ -117,6 +167,46 @@ export function ItemList({ refreshKey = 0 }: ItemListProps) {
           );
         })}
       </ul>
+
+      {itemParaExcluir && (
+        <div
+          className="item-confirm-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-delete-title"
+        >
+          <div className="item-confirm-modal">
+            <h3 id="confirm-delete-title" className="item-confirm-title">
+              Excluir item
+            </h3>
+            <p className="item-confirm-text">
+              Deseja realmente remover <strong>{itemParaExcluir.nome}</strong> do estoque?
+            </p>
+            <div className="item-confirm-buttons">
+              <button
+                type="button"
+                className="item-confirm-cancel"
+                onClick={() => setItemParaExcluir(null)}
+                disabled={deletingId !== null}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="item-confirm-delete"
+                onClick={() => handleConfirmDelete(itemParaExcluir.id)}
+                disabled={deletingId !== null}
+              >
+                {deletingId === itemParaExcluir.id ? (
+                  <span className="spinner-small" />
+                ) : (
+                  'Excluir'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

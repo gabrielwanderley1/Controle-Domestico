@@ -69,7 +69,10 @@ export function HomePage() {
           onFeedback={showFeedback}
         />
 
-        <ItemList refreshKey={refreshKey} />
+        <ItemList
+          refreshKey={refreshKey}
+          onFeedback={showFeedback}
+        />
       </main>
     </div>
   );

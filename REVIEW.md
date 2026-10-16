@@ -208,4 +208,18 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - Front-end: falha de inicialização do push libera nova tentativa (antes travava até o logout).
   - Novo script `npm run test-push` (somente push, sem e-mail).
 
+### [TASK-11] - Reposição Inteligente de Estoque por Nome e Exclusão de Itens
+- **Data da Revisão:** 2026-10-15
+- **Veredito:** APROVADO
+- **Arquivos Auditados:**
+  - `Aplicativo/src/components/AddItemForm.tsx`
+  - `Aplicativo/src/components/ItemList.tsx`
+  - `Aplicativo/src/components/ItemList.css`
+  - `Aplicativo/src/pages/HomePage.tsx`
+- **Validações Realizadas:**
+  - [x] Conformidade de escopo com `CONTEXTO.md` (Nenhuma alteração em `Worker/`, `fcm_tokens` ou configurações nativas do Capacitor; uso exclusivo de `FeedbackPopup` sem `alert()` nativo; mensagem de sucesso *"Alterações salvas com sucesso!"*).
+  - [x] Lógica de reposição inteligente por nome (`trim().toLowerCase()`) realizando `UPDATE` no registro existente e recalculando `data_estimada_termino = nova_data_compra + (nova_quantidade * duracao_dias_unidade)` em fuso local.
+  - [x] Exclusão de itens (`DELETE`) com confirmação prévia em modal Dark Mode e remoção imediata do card no estado local (`setItens(prev => prev.filter(item => item.id !== itemId))`).
+  - [x] Verificação de integridade da tipagem e build (`npm run build` executado com 0 erros).
+
 ---

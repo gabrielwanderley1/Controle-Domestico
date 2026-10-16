@@ -1,22 +1,23 @@
 import { useState, type FormEvent } from 'react';
-import { insertItem } from '../services/itensService';
+import { fetchItens, insertItem, updateItem } from '../services/itensService';
 import './AddItemForm.css';
 
 interface AddItemFormProps {
-  /** Callback disparado após inserção bem-sucedida. Permite ao componente pai sincronizar listas. */
+  /** Callback disparado após inserção ou atualização bem-sucedida. Permite ao componente pai sincronizar listas. */
   onItemAdded?: () => void;
   /** Callback para exibir feedback visual (sucesso/erro). */
   onFeedback?: (message: string, type: 'success' | 'error') => void;
 }
 
 /**
- * Formulário modular para cadastro de itens no estoque.
+ * Formulário modular para cadastro e reposição inteligente de itens no estoque.
  *
  * Calcula automaticamente a `data_estimada_termino` com base em:
  *   data_estimada_termino = data_compra + (quantidade × duracao_dias_unidade)
  *
- * Persiste diretamente no Supabase via `insertItem()`. O RLS garante
- * que o item é associado ao usuário autenticado (auth.uid()).
+ * Caso já exista um item do usuário com o mesmo nome (ignorando maiúsculas/minúsculas
+ * e espaços nas extremidades), realiza `UPDATE` recalibrando o ciclo de validade;
+ * caso contrário, realiza `INSERT`.
  */
 export function AddItemForm({ onItemAdded, onFeedback }: AddItemFormProps) {
   const [nome, setNome] = useState('');
@@ -52,20 +53,44 @@ export function AddItemForm({ onItemAdded, onFeedback }: AddItemFormProps) {
       return;
     }
 
-    // ── Cálculo da data estimada de término ───────────────────
-    const totalDias = qtd * duracao;
-    const dataEstimadaTermino = calcularDataTermino(dataCompra, totalDias);
-
-    // ── Persistência no Supabase ──────────────────────────────
+    // ── Persistência no Supabase (INSERT ou UPDATE por nome) ──
     setIsSubmitting(true);
     try {
-      await insertItem({
-        nome: nomeTrimmed,
-        quantidade: qtd,
-        duracao_dias_unidade: duracao,
-        data_compra: dataCompra,
-        data_estimada_termino: dataEstimadaTermino,
-      });
+      const nomeNormalizado = nomeTrimmed.toLowerCase();
+      const itensExistentes = await fetchItens();
+      const itemExistente = itensExistentes.find(
+        (item) => item.nome.trim().toLowerCase() === nomeNormalizado,
+      );
+
+      if (itemExistente) {
+        // Reposição: define a nova quantidade, atualiza data_compra e duracao_dias_unidade,
+        // e recalcula obrigatoriamente a data_estimada_termino
+        const novaQuantidade = qtd;
+        const novaDataCompra = dataCompra;
+        const novaDuracao = duracao;
+        const novaDataEstimadaTermino = calcularDataTermino(
+          novaDataCompra,
+          novaQuantidade * novaDuracao,
+        );
+
+        await updateItem(itemExistente.id, {
+          quantidade: novaQuantidade,
+          duracao_dias_unidade: novaDuracao,
+          data_compra: novaDataCompra,
+          data_estimada_termino: novaDataEstimadaTermino,
+        });
+      } else {
+        const totalDias = qtd * duracao;
+        const dataEstimadaTermino = calcularDataTermino(dataCompra, totalDias);
+
+        await insertItem({
+          nome: nomeTrimmed,
+          quantidade: qtd,
+          duracao_dias_unidade: duracao,
+          data_compra: dataCompra,
+          data_estimada_termino: dataEstimadaTermino,
+        });
+      }
 
       onFeedback?.('Alterações salvas com sucesso!', 'success');
       resetForm();
