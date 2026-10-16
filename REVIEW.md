@@ -222,4 +222,23 @@ Toda tarefa deve ser aprovada sob os seguintes pilares antes de ser considerada 
   - [x] Exclusão de itens (`DELETE`) com confirmação prévia em modal Dark Mode e remoção imediata do card no estado local (`setItens(prev => prev.filter(item => item.id !== itemId))`).
   - [x] Verificação de integridade da tipagem e build (`npm run build` executado com 0 erros).
 
+### [TASK-12] - Teste E2E, Canal de Notificação Android 8+ e Apresentação em Foreground
+- **Data da Revisão:** 2026-10-15
+- **Veredito:** APROVADO
+- **Arquivos Auditados:**
+  - `Aplicativo/capacitor.config.ts`
+  - `Aplicativo/android/app/src/main/AndroidManifest.xml`
+  - `Aplicativo/src/services/pushNotificationService.ts`
+  - `Worker/src/push.ts`
+  - `Worker/src/testPush.ts`
+  - `Worker/test-push.js` (novo)
+- **Validações Realizadas:**
+  - [x] Auditoria real na tabela `fcm_tokens` (2 tokens encontrados, 1 órfão removido automaticamente e 1 ativo validado com entrega real via FCM `messageId`).
+  - [x] Auditoria real na tabela `itens` (3 itens com vencimento `>= 2026-10-22`, acima da janela `<= 2026-10-18` de 3 dias da rotina diária).
+  - [x] Criação explícita do canal de notificação Android (`id: 'default'`, `importance: 5`) via `PushNotifications.createChannel` e `<meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="default" />` no `AndroidManifest.xml`.
+  - [x] Declaração explícita de `<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />` no `AndroidManifest.xml`.
+  - [x] Configuração de `presentationOptions: ['badge', 'sound', 'alert']` em `capacitor.config.ts` para exibição de banners mesmo com o app em primeiro plano (foreground).
+  - [x] Correção de fuso horário local em `Worker/src/push.ts` (`getLocalISODate`) e inclusão de `channelId: 'default'` e `sound: 'default'` no payload Android.
+  - [x] `npm run build` e `npx cap sync android` executados com 0 erros.
+
 ---

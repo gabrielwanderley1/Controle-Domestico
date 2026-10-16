@@ -11,6 +11,11 @@ const config: CapacitorConfig = {
     // Fundo escuro enquanto a WebView carrega (evita flash branco)
     backgroundColor: '#121220',
   },
+  plugins: {
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
+  },
 };
 
 export default config;

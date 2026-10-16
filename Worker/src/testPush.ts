@@ -26,7 +26,8 @@ if (error) {
     porUsuario.set(row.user_id, [...(porUsuario.get(row.user_id) ?? []), row.token]);
   }
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const hoje = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   for (const [userId, tokens] of porUsuario) {
     await enviarPush({
       userId,

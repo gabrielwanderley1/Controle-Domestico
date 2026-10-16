@@ -20,10 +20,18 @@ const TOKEN_INVALIDO = new Set([
   'messaging/invalid-argument',
 ]);
 
+/** Retorna data no formato YYYY-MM-DD (fuso local, sem distorção de UTC). */
+function getLocalISODate(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 /** Monta o corpo curto da notificação. */
 function montarCorpo(alerta: AlertaUsuario): string {
   const [primeiro, ...resto] = alerta.itens;
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = getLocalISODate();
   const quando = primeiro.data_estimada_termino <= hoje
     ? 'já acabou ou acaba hoje'
     : `deve acabar em ${primeiro.data_estimada_termino.split('-').reverse().join('/')}`;
@@ -50,7 +58,13 @@ export async function enviarPush(alerta: AlertaUsuario): Promise<number> {
       title: 'Aviso de Validade / Estoque',
       body: montarCorpo(alerta),
     },
-    android: { priority: 'high' },
+    android: {
+      priority: 'high',
+      notification: {
+        channelId: 'default',
+        sound: 'default',
+      },
+    },
   });
 
   console.log(`  📲 Push ${alerta.userId}: ${response.successCount} enviado(s), ${response.failureCount} falha(s)`);

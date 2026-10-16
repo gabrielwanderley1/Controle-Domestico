@@ -120,8 +120,21 @@ export async function initPushNotifications(userId: string): Promise<void> {
 
     if (perm.receive !== 'granted') {
       console.warn('[push] Permissão de notificação negada ou não concedida:', perm.receive);
+      initialized = false;
+      await PushNotifications.removeAllListeners();
       return;
     }
+
+    // ── Canal de notificação Android 8+ (Importância Alta = 5) ─
+    await PushNotifications.createChannel({
+      id: 'default',
+      name: 'Alertas de Estoque',
+      description: 'Avisos de itens próximos do término ou vencidos',
+      importance: 5,
+      visibility: 1,
+      vibration: true,
+      sound: 'default',
+    });
 
     await PushNotifications.register();
   } catch (err) {
